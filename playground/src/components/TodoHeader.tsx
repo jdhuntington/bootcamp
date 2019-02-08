@@ -1,20 +1,33 @@
-import React from 'react';
-import { Text, Stack } from '@uifabric/experiments';
-import { Pivot, PivotItem, TextField } from 'office-ui-fabric-react';
-import { FilterTypes } from '../store';
+import React from "react";
+import { Text, Stack } from "@uifabric/experiments";
+import { Pivot, PivotItem, TextField } from "office-ui-fabric-react";
+import { actions, actionsWithService } from "../actions";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import { Store, FilterTypes } from "../store";
 
-export interface TodoHeaderProps {
+export interface TodoHeaderProps {}
+
+interface PropsFromDispatch {
   add: (label: string) => void;
-  remove: (id: string) => void;
-  filter: (filter: FilterTypes) => void;
+  setFilter: (f: FilterTypes) => void;
 }
 
-export interface TodoHeaderState {
+interface PropsFromState {
+  filter: FilterTypes;
+}
+
+interface TodoHeaderState {
   labelInput: string;
 }
 
-export class TodoHeader extends React.Component<TodoHeaderProps, TodoHeaderState> {
-  constructor(props: TodoHeaderProps) {
+type TodoHeaderInternalProps = PropsFromState & PropsFromDispatch;
+
+class TodoHeader extends React.Component<
+  TodoHeaderInternalProps,
+  TodoHeaderState
+> {
+  constructor(props: TodoHeaderInternalProps) {
     super(props);
     this.state = { labelInput: undefined };
   }
@@ -31,7 +44,7 @@ export class TodoHeader extends React.Component<TodoHeaderProps, TodoHeaderState
   };
 
   onFilter = (item: PivotItem) => {
-    this.props.filter(item.props.headerText as FilterTypes);
+    this.props.setFilter(item.props.headerText as FilterTypes);
   };
 
   render() {
@@ -57,3 +70,26 @@ export class TodoHeader extends React.Component<TodoHeaderProps, TodoHeaderState
     );
   }
 }
+
+export function mapStateToProps(
+  store: Store,
+  ownProps: TodoHeaderProps
+): PropsFromState {
+  return {
+    filter: store.filter
+  };
+}
+
+export function mapDispatchToProps(dispatch: Dispatch<any>): PropsFromDispatch {
+  return {
+    add: (label: string) => dispatch(actionsWithService.add(label)),
+    setFilter: (filter: FilterTypes) => dispatch(actions.filter(filter))
+  };
+}
+
+const component = connect<TodoHeaderProps>(
+  mapStateToProps,
+  mapDispatchToProps
+)(TodoHeader);
+
+export { component as TodoHeader };

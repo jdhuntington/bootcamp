@@ -1,7 +1,11 @@
-import React from 'react';
-import { Stack } from '@uifabric/experiments';
-import { TodoListItem } from './TodoListItem';
-import { TodoItem, FilterTypes } from '../store';
+import React from "react";
+import { Stack } from "@uifabric/experiments";
+import { TodoListItem } from "./TodoListItem";
+import { TodoItem, Store, FilterTypes } from "../store";
+import { DefaultButton } from "office-ui-fabric-react";
+import { actions, actionsWithService } from "../actions";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 export interface TodoListProps {
   todos: { [id: string]: TodoItem };
@@ -17,7 +21,7 @@ export class TodoList extends React.Component<TodoListProps> {
     let filteredTodos: typeof todos = {};
 
     switch (filter) {
-      case 'completed':
+      case "completed":
         Object.keys(todos).forEach(id => {
           if (todos[id].completed) {
             filteredTodos[id] = todos[id];
@@ -25,7 +29,7 @@ export class TodoList extends React.Component<TodoListProps> {
         });
         break;
 
-      case 'active':
+      case "active":
         Object.keys(todos).forEach(id => {
           if (!todos[id].completed) {
             filteredTodos[id] = todos[id];
@@ -42,17 +46,7 @@ export class TodoList extends React.Component<TodoListProps> {
       <Stack verticalGap={10}>
         {Object.keys(filteredTodos).map(id => {
           const todo = filteredTodos[id];
-          return (
-            <TodoListItem
-              key={id}
-              checked={todo.completed}
-              label={todo.label}
-              complete={this.props.complete}
-              id={id}
-              edit={this.props.edit}
-              remove={this.props.remove}
-            />
-          );
+          return <TodoListItem key={id} itemId={id} />;
         })}
       </Stack>
     );
